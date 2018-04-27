@@ -5,32 +5,21 @@
 #include <wchar.h>
 #include <conio.h>
 #include <string>
-#include "readcsv.h"
 #include "template.h"
 #pragma warning(disable: 4996 )
 using namespace std;
 struct sv
 {
-	wchar_t *mssv;
-	wchar_t *hoten;
-	wchar_t *khoa;
-	wchar_t *nienkhoa;
-	wchar_t *ngaysinh;
-	wchar_t *image;
-	wchar_t *mota;
-	wchar_t *email;
-	unsigned int demsothich;
-	wchar_t **sothich;
+	wchar_t mssv[11];
+	wchar_t hoten[31];
+	wchar_t khoa[31];
+	wchar_t nienkhoa[5];
+	wchar_t ngaysinh[11];
+	wchar_t image[100];
+	wchar_t mota[1001];
+	wchar_t email[31];
+	wchar_t sothich[1001];
 };
-int mssv = 11;
-int hoten = 31;
-int khoa = 31;
-int nienkhoa = 5;
-int ngaysinh = 11;
-int email = 31;
-int image = 100;
-int mota = 1001;
-int sothich = 1001;
 int sosv(FILE *&f)
 {
 	rewind(f);
@@ -46,97 +35,67 @@ int sosv(FILE *&f)
 	}
 	return dem;
 }
-void readfile(FILE *f)
+void xoa(wchar_t s[], int vt)
 {
-	_setmode(_fileno(f), _O_U8TEXT);
-	int dem = 0;
-	wchar_t** p = (wchar_t**)malloc(20 * sizeof(wchar_t*));
-	if (f != NULL)
+	int n = wcslen(s);
+	for (int i = vt; i < n; i++)
 	{
-		while (!feof(f))
-		{
-			p[dem] = (wchar_t*)malloc(1000 * sizeof(wchar_t));
-			fgetws(*(p + dem), 1000, f);
-			p[dem][wcslen(p[dem]) - 1] = L'\0';
-			dem++;
-			XuLiChuoi(p[dem]);
-		}
-		dem--;
-		for (int i = 0; i < dem; i++)
-		{
-			sv A;
-			int demhobbies = 0;
-			wchar_t* flag[10];
-			wchar_t* tmp;
-			// MSSV
-			if (i == 0)
-			{
-				tmp = wcstok(p[i], L",");
-				A.mssv = wcstok(NULL, L",");
-				xoakep(A.mssv);
-			}
-			else
-			{
-				A.mssv = wcstok(p[i], L",");
-				xoakep(A.mssv);
-			}
-			// Ho va ten
-			tmp = wcstok(NULL, L",");
-			A.hoten = wcstok(NULL, L",");
-			xoakep(A.hoten);
-			// Khoa
-			tmp = wcstok(NULL, L",");
-			A.khoa = wcstok(NULL, L",");
-			xoakep(A.khoa);
-			// Nien khoa
-			tmp = wcstok(NULL, L",");
-			A.nienkhoa = wcstok(NULL, L",");
-			xoakep(A.nienkhoa);
-			// Ngay sinh
-			tmp = wcstok(NULL, L",");
-			A.ngaysinh = wcstok(NULL, L",");
-			xoakep(A.ngaysinh);
-			// Hinh anh
-			tmp = wcstok(NULL, L",");
-			A.image = wcstok(NULL, L",");
-			xoakep(A.image);
-			// Email
-			tmp = wcstok(NULL, L",");
-			A.email = wcstok(NULL, L",");
-			xoakep(A.email);
-			// Mo ta ban than
-			tmp = wcstok(NULL, L",");
-			A.mota = wcstok(NULL, L",");
-			TraLaiKiTu(A.mota);
-			xoakep(A.mota);
-			// So thich
-			tmp = wcstok(NULL, L",");
-			flag[demhobbies] = wcstok(NULL, L",");
-			while (flag[demhobbies] != NULL)
-			{
-				demhobbies++;
-				xoakep(flag[demhobbies]);
-				TraLaiKiTu(flag[A.demsothich]);
-				tmp = wcstok(NULL, L",");
-				flag[demhobbies] = wcstok(NULL, L",");
-			}
-			A.demsothich = demhobbies;
-			A.sothich = (wchar_t**)malloc(A.demsothich * sizeof(wchar_t*));
-			for (unsigned int j = 0; j < A.demsothich; j++)
-			{
-				*(A.sothich + j) = flag[j];
-			}
-			free(A.sothich);
-		}
-		fclose(f);
+		s[i] = s[i + 1];
 	}
-	for (int i = 0; i < dem; i++)
-	{
-		free(*(p + i));
-	}
-	free(p);
+	s[n - 1] = '\0';
+
 }
-void xuatdssv(sv *SV, int sosv)
+void xoakep(wchar_t s[])
+{
+	int n = wcslen(s), i;
+	for (i = 0; i < n; i++)
+	{
+		while (s[i] == '"' && s[i + 1] == ',' && s[i + 2] == '"')
+		{
+			xoa(s, i);
+			s[i] = ',';
+			s[i + 1] = ' ';
+		}
+		while (s[i] == '"')
+		{
+			xoa(s, i);
+		}
+	}
+}
+void readfile(FILE *f, int &dem)
+{
+	sv SV[100];
+	wchar_t str[2400];
+	wchar_t *token;
+	wchar_t s[4] = L",";
+	int i;
+	int sosothich[1000];
+	for (i = 1; i <= dem; i++)
+	{
+		fgetws(str, 2400, f);
+		sosothich[i] = 0;
+		token = wcstok(str, s); xoakep(token);  wcscpy(SV[i].mssv, token);
+		token = wcstok(NULL, s); xoakep(token); wcscpy(SV[i].hoten, token);
+		token = wcstok(NULL, s); xoakep(token); wcscpy(SV[i].khoa, token);
+		token = wcstok(NULL, s); xoakep(token); wcscpy(SV[i].nienkhoa, token);
+		token = wcstok(NULL, s); xoakep(token); wcscpy(SV[i].ngaysinh, token);
+		token = wcstok(NULL, s); xoakep(token); wcscpy(SV[i].image, token);
+		token = wcstok(NULL, s); xoakep(token); wcscpy(SV[i].email, token);
+		token = wcstok(NULL, L"\"\""); wcscpy(SV[i].mota, token);
+		token = wcstok(NULL, L"\n");//lay tat ca thong tin con lai
+		while (token != NULL)
+		{
+			sosothich[i]++;
+			if (sosothich[i] == 1)
+			{
+				xoakep(token);
+				wcscpy(SV[i].sothich, token);
+			}
+			token = wcstok(NULL, L"\0");
+		}
+	}
+}
+void xuatdssv(sv SV[100], int sosv)
 {
 	for (int i = 0; i < sosv; i++)
 	{
@@ -148,47 +107,154 @@ void xuatdssv(sv *SV, int sosv)
 		wprintf(L"\n-Ngày sinh: %ls  ", SV[i].ngaysinh);
 		wprintf(L"\n-Hình ảnh: %ls  ", SV[i].image);
 		wprintf(L"\n-Mô tả bản thân:  %ls ", SV[i].mota);
-		for (unsigned int k = 0; k < SV[i].demsothich; k++)
-			wprintf(L"\n-Sở thích %d: ", k + 1, *(SV[i].sothich + k));
-	}
-		
+		wprintf(L"\n-Sở thích %d: ", SV[i].sothich);
+	}	
 }
-void ThayThe(sv SV, wchar_t *a)
+// tuy chon profile page
+struct Choose
 {
-	wchar_t *ch;
-	TimKiemVaThayThe(L"1212123", SV.mssv, a);
-	TimKiemVaThayThe(L"Nguyễn Văn A", SV.hoten, a);
-	TimKiemVaThayThe(L"NGUYỄN VĂN A", SV.hoten, a);
-	TimKiemVaThayThe(L"Công nghệ thông tin", SV.khoa, a);
-	TimKiemVaThayThe(L"CÔNG NGHỆ THÔNG TIN", wcsupr(SV.khoa), a);
-	TimKiemVaThayThe(L"nva@gmail.com", SV.email, a);
-	TimKiemVaThayThe(L"20/01/1994", SV.ngaysinh, a);
-	TimKiemVaThayThe(L"HinhCaNhan.jpg", SV.image, a);
-	TimKiemVaThayThe(L"Tôi là một người rất thân thiện.", SV.mota, a);
-	for (int i = 0; i < SV.demsothich; i++)
-		TimKiemVaThayThe(L"Hobbies ", *(SV.sothich + i), a);
+	int MSSV;
+	int Ten;
+	int Khoa;
+	int Email;
+	int Ngaysinh;
+	int Hinhanh;
+	int Motabanthan;
+	int Sothich;
+};
+void Choice(Choose &luachon)
+{
+	// 0: không chọn || 1: có chọn
+	do
+	{
+		wprintf(L"In tên: ");
+		scanf_s("%d", &luachon.Ten);
+	} while (luachon.Ten != 0 && luachon.Ten != 1);
+	do
+	{
+		wprintf(L"In MSSV: ");
+		scanf_s("%d", &luachon.MSSV);
+	} while (luachon.MSSV != 0 && luachon.MSSV != 1);
+	do
+	{
+		wprintf(L"In Khoa: ");
+		scanf_s("%d", &luachon.Khoa);
+	} while (luachon.Khoa != 0 && luachon.Khoa != 1);
+	do
+	{
+		wprintf(L"In Email: ");
+		scanf_s("%d", &luachon.Email);
+	} while (luachon.Email != 0 && luachon.Email != 1);
+	do
+	{
+		wprintf(L"In Năm Sinh: ");
+		scanf_s("%d", &luachon.Ngaysinh);
+	} while (luachon.Ngaysinh != 0 && luachon.Ngaysinh != 1);
+	do
+	{
+		wprintf(L"In Ảnh Đại Diện : ");
+		scanf_s("%d", &luachon.Hinhanh);
+	} while (luachon.Hinhanh != 0 && luachon.Hinhanh != 1);
+	do
+	{
+		wprintf(L"In Mô tả: ");
+		scanf_s("%d", &luachon.Motabanthan);
+	} while (luachon.Motabanthan != 0 && luachon.Motabanthan != 1);
+	do
+	{
+		wprintf(L"In Sở Thích: ");
+		scanf_s("%d", &luachon.Sothich);
+	} while (luachon.Sothich != 0 && luachon.Sothich != 1);
 }
-void TaoFileHtml(sv SV, wchar_t *a)
+void ThayThe(sv SV, wchar_t *b)
+{
+	Choose c;
+	Choice(c);
+	wchar_t tmp[] = L"\0";	//Chuỗi rỗng
+	if (c.MSSV == 1)
+		TimKiemVaThayThe(L"1212123", SV.mssv, b);
+	else
+		TimKiemVaThayThe(L"1212123", tmp, b);
+	if (c.Ten == 1)
+	{
+		TimKiemVaThayThe(L"Nguyễn Văn A", SV.hoten, b);
+		TimKiemVaThayThe(L"NGUYỄN VĂN A", SV.hoten, b);
+	}
+	else TimKiemVaThayThe(L"Nguyễn Văn A", tmp, b);
+	if (c.Khoa == 1)
+	{
+		TimKiemVaThayThe(L"CÔNG NGHỆ THÔNG TIN", wcsupr(SV.khoa), b);
+		TimKiemVaThayThe(L"Công nghệ thông tin", SV.khoa, b);
+	}
+	else
+		TimKiemVaThayThe(L"Công nghệ thông tin", tmp, b);
+	if (c.Email == 1)
+		TimKiemVaThayThe(L"nva@gmail.com", SV.email, b);
+	else
+		TimKiemVaThayThe(L"nva@gmail.com", tmp, b);
+	if (c.Hinhanh == 1)
+		TimKiemVaThayThe(L"HinhCaNhan.jpg", SV.image, b);
+	else
+		TimKiemVaThayThe(L"HinhCaNhan.jpg", tmp, b);
+	if (c.Ngaysinh == 1)
+		TimKiemVaThayThe(L"20/01/1994", SV.ngaysinh, b);
+	else
+		TimKiemVaThayThe(L"20/01/1994", tmp, b);
+	if (c.Motabanthan == 1)
+		TimKiemVaThayThe(L"Tôi là một người rất thân thiện.", SV.mota, b);
+	else
+		TimKiemVaThayThe(L"Tôi là một người rất thân thiện.", tmp, b);
+	if (c.Sothich == 1)
+	{
+		TimKiemVaThayThe(L"Hobbies ", SV.sothich, b);
+	}
+	else
+		TimKiemVaThayThe(L"Hobbies ", tmp, b);
+}
+void xuatHTML(sv SV, wchar_t a[1000])
 {
 	wchar_t filename[30];
 	wcscpy(filename, L"Website\\");
 	wcscat(filename, SV.mssv);
 	wcscat(filename, L".html");
 	FILE* fp = _wfopen(filename, L"w, ccs=UTF-8");
-	wchar_t* b = wcsdup(a);
+	wchar_t *b = wcsdup(a);
 	ThayThe(SV, b);
 	fputws(b, fp);
 	fclose(fp);
 }
-// tuy chon profile page
-
 void wmain()
 {
 	//Doc unicode
 	_setmode(_fileno(stdout), _O_U8TEXT);
 	_setmode(_fileno(stdin), _O_U8TEXT);
-	
+	sv SV[100];
+	wchar_t *a = NULL;
+	int n;
+	FILE* fpds = _wfopen(L"test.csv", L"r, ccs=UTF-8");
+	FILE* fphtml = _wfopen(L"1212123.htm", L"r,ccs=UTF-8");
+	if (!fpds || !fphtml)
+	{
+		wprintf(L"Không thể đọc file \n");
+		return;
+	}
+	else
+	{
+		n = sosv(fpds);
+		wprintf(L"Danh sách chứa %d sinh viên\n", n);
+		if (n == 0)
+			printf("Empty\n");
+		else
+		{
+			readfile(fpds,n);
+			xuatdssv(SV, n);
+			wprintf(L"Xin mời bạn lựa chọn có xuất thông tin hay không. \nChọn: 1. \nKhông chọn: 0 ");
+			for (int i = 0; i < n; i++)
+				xuatHTML(SV[i], a);
+		}
+	}
+	free(SV);
+	free(a);
+	fcloseall();
 	system("pause");
 }
-
-
