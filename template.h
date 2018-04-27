@@ -1,4 +1,4 @@
-﻿#ifndef template_h
+#ifndef template_h
 #define template_h
 #include <stdio.h>
 #include <iostream>
@@ -13,7 +13,7 @@ using namespace std;
 * Example: "xin chao $name"
 * Change to: "xin chao NPV"
 */
-unsigned int Find(wchar_t* str, wchar_t* substr,unsigned int startPos)
+unsigned int Find(wchar_t str[1000], wchar_t substr[1000],unsigned int startPos)
 {
 	unsigned int length = wcslen(str);
 	unsigned int length1 = wcslen(substr);
@@ -32,16 +32,16 @@ unsigned int Find(wchar_t* str, wchar_t* substr,unsigned int startPos)
 	}
 	return -1;
 }
-void Delete(wchar_t* src,unsigned int startPos,unsigned int numChar)
+void Delete(wchar_t src[1000],unsigned int startPos,unsigned int numChar)
 {
-	int length = wcslen(src);
-	for (int i = startPos; i < length - numChar; i++)
+	unsigned int length = wcslen(src);
+	for (unsigned int i = startPos; i < length - numChar; i++)
 	{
 		src[i] = src[i + numChar];
 	}
 	src[length - numChar] = '\0';
 }
-void Insert(wchar_t* chuoicha, wchar_t* chuoicon, int vitri)
+void Insert(wchar_t chuoicha[1000], wchar_t chuoicon[1000], int vitri)
 {
 	int l = wcslen(chuoicha);
 	int l1 = wcslen(chuoicon);
@@ -49,7 +49,7 @@ void Insert(wchar_t* chuoicha, wchar_t* chuoicon, int vitri)
 	wcscpy(temp, chuoicha + vitri);
 	wcscpy(chuoicha + vitri, chuoicon);
 }
-void TimKiemVaThayThe(wchar_t *s, wchar_t *s1, wchar_t *s2)
+void TimKiemVaThayThe(wchar_t s[1000], wchar_t s1[1000], wchar_t s2[1000])
 {
 	int n = wcslen(s);
 	int n1 = wcslen(s1);
